@@ -1,0 +1,25 @@
+{
+  "name": "meetup",
+  "version": "1.0.0",
+  "description": "A Google Meet-style video conferencing app (WebRTC mesh + Socket.IO signaling)",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test \"test/**/*.test.js\"",
+    "test:e2e": "playwright test"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "socket.io-client": "^4.8.1"
+  }
+}

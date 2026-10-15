@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meetup — Video meetings</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect width='24' height='24' rx='6' fill='%231a73e8'/><path fill='white' d='M15 10.5V8a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-2.5l4 3v-9z'/></svg>" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- HOME -->
+  <section id="view-home" class="view home" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="logo"></span>Meetup</div>
+      <div class="clock" id="home-clock"></div>
+    </header>
+    <main class="home-main">
+      <div class="home-copy">
+        <h1>Video calls and meetings for everyone</h1>
+        <p class="sub">Connect, collaborate, and celebrate from anywhere.</p>
+        <div class="home-actions">
+          <button class="btn primary" id="new-meeting" data-testid="new-meeting">
+            <svg class="i"><use href="#i-video-call"/></svg> New meeting
+          </button>
+          <form id="join-form" class="join-form" data-testid="join-form">
+            <input id="join-code" data-testid="join-code" placeholder="Enter a code or link" autocomplete="off" aria-label="Meeting code" />
+            <button class="btn text" type="submit" id="join-btn" data-testid="join-btn" disabled>Join</button>
+          </form>
+        </div>
+        <p class="error" id="home-error" data-testid="home-error" role="alert" hidden></p>
+        <hr />
+        <p class="muted">Peer-to-peer video powered by WebRTC. Up to 8 people per meeting.</p>
+      </div>
+      <div class="home-art" aria-hidden="true">
+        <div class="art-grid"><span></span><span></span><span></span><span></span></div>
+      </div>
+    </main>
+  </section>
+
+  <!-- LOBBY / GREEN ROOM -->
+  <section id="view-lobby" class="view lobby" hidden>
+    <header class="topbar">
+      <a class="brand" href="/"><span class="logo"></span>Meetup</a>
+    </header>
+    <main class="lobby-main">
+      <div class="preview">
+        <video id="preview-video" data-testid="preview-video" autoplay playsinline muted></video>
+        <div class="preview-off" id="preview-off" data-testid="preview-off" hidden>Camera is off</div>
+        <div class="preview-controls">
+          <button class="round" id="lobby-mic" data-testid="lobby-mic" aria-label="Turn off microphone"><svg class="i"><use href="#i-mic"/></svg></button>
+          <button class="round" id="lobby-cam" data-testid="lobby-cam" aria-label="Turn off camera"><svg class="i"><use href="#i-cam"/></svg></button>
+        </div>
+        <p class="media-error" id="media-error" data-testid="media-error" hidden></p>
+      </div>
+      <div class="lobby-side">
+        <h2>Ready to join?</h2>
+        <p class="muted" id="lobby-status" data-testid="lobby-status">No one else is here</p>
+        <form id="lobby-form">
+          <input id="name-input" data-testid="name-input" placeholder="Your name" maxlength="40" autocomplete="name" aria-label="Your name" />
+          <button class="btn primary pill" id="join-now" data-testid="join-now" type="submit" disabled>Join now</button>
+        </form>
+        <p class="error" id="lobby-error" data-testid="lobby-error" role="alert" hidden></p>
+        <p class="code-line">Meeting code: <strong id="lobby-code" data-testid="lobby-code"></strong></p>
+      </div>
+    </main>
+  </section>
+
+  <!-- MEETING -->
+  <section id="view-meeting" class="view meeting" hidden>
+    <div class="stage">
+      <div class="grid" id="grid" data-testid="grid"></div>
+      <aside class="panel" id="panel" hidden>
+        <header>
+          <h3 id="panel-title">In-call messages</h3>
+          <button class="icon-btn" id="panel-close" aria-label="Close panel"><svg class="i"><use href="#i-close"/></svg></button>
+        </header>
+        <div class="panel-body" id="panel-chat" data-testid="panel-chat">
+          <p class="hint">Messages can only be seen by people in the call and are deleted when the call ends.</p>
+          <ol class="messages" id="messages" data-testid="messages"></ol>
+          <form class="chat-form" id="chat-form">
+            <input id="chat-input" data-testid="chat-input" placeholder="Send a message" maxlength="1000" autocomplete="off" aria-label="Message" />
+            <button class="icon-btn" id="chat-send" data-testid="chat-send" aria-label="Send message" disabled><svg class="i"><use href="#i-send"/></svg></button>
+          </form>
+        </div>
+        <div class="panel-body" id="panel-people" data-testid="panel-people" hidden>
+          <ul class="people" id="people"></ul>
+        </div>
+        <div class="panel-body" id="panel-info" hidden>
+          <p class="info-title">Joining info</p>
+          <p class="info-link" id="info-link" data-testid="info-link"></p>
+          <button class="btn text" id="copy-link" data-testid="copy-link"><svg class="i"><use href="#i-copy"/></svg> Copy joining info</button>
+        </div>
+      </aside>
+    </div>
+    <div class="reactions-layer" id="reactions-layer" aria-hidden="true"></div>
+    <footer class="controls">
+      <div class="left"><span id="meeting-clock"></span><span class="sep">|</span><span id="meeting-code" data-testid="meeting-code"></span></div>
+      <div class="center">
+        <button class="round" id="btn-mic" data-testid="btn-mic" aria-label="Turn off microphone (ctrl + d)"><svg class="i"><use href="#i-mic"/></svg></button>
+        <button class="round" id="btn-cam" data-testid="btn-cam" aria-label="Turn off camera (ctrl + e)"><svg class="i"><use href="#i-cam"/></svg></button>
+        <button class="round" id="btn-hand" data-testid="btn-hand" aria-label="Raise hand"><svg class="i"><use href="#i-hand"/></svg></button>
+        <div class="react-wrap">
+          <button class="round" id="btn-react" data-testid="btn-react" aria-label="Send a reaction"><svg class="i"><use href="#i-mood"/></svg></button>
+          <div class="react-menu" id="react-menu" data-testid="react-menu" hidden></div>
+        </div>
+        <button class="round" id="btn-screen" data-testid="btn-screen" aria-label="Present now"><svg class="i"><use href="#i-present"/></svg></button>
+        <button class="round danger wide" id="btn-leave" data-testid="btn-leave" aria-label="Leave call"><svg class="i"><use href="#i-call-end"/></svg></button>
+      </div>
+      <div class="right">
+        <button class="icon-btn" id="btn-info" data-testid="btn-info" aria-label="Meeting details"><svg class="i"><use href="#i-info"/></svg></button>
+        <button class="icon-btn" id="btn-people" data-testid="btn-people" aria-label="Show everyone"><svg class="i"><use href="#i-people"/></svg><span class="badge" id="people-count" data-testid="people-count">1</span></button>
+        <button class="icon-btn" id="btn-chat" data-testid="btn-chat" aria-label="Chat with everyone"><svg class="i"><use href="#i-chat"/></svg><span class="dot" id="chat-dot" data-testid="chat-dot" hidden></span></button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- LEFT -->
+  <section id="view-left" class="view left-view" hidden>
+    <main class="center-col">
+      <h1 data-testid="left-title">You left the meeting</h1>
+      <div class="row">
+        <button class="btn outline" id="rejoin" data-testid="rejoin">Rejoin</button>
+        <button class="btn primary" id="home-btn" data-testid="home-btn">Return to home screen</button>
+      </div>
+    </main>
+  </section>
+
+  <button class="btn primary enable-sound" id="enable-sound" data-testid="enable-sound" hidden>Click to turn on sound</button>
+  <div class="toasts" id="toasts" data-testid="toasts" aria-live="polite"></div>
+
+  <template id="tile-tpl">
+    <div class="tile" data-testid="tile">
+      <video autoplay playsinline muted></video>
+      <audio autoplay></audio>
+      <div class="avatar"><span></span></div>
+      <div class="tile-hand" title="Hand raised"><svg class="i"><use href="#i-hand"/></svg></div>
+      <div class="tile-muted" title="Muted"><svg class="i"><use href="#i-mic-off"/></svg></div>
+      <div class="tile-name"></div>
+    </div>
+  </template>
+
+  <!-- Material icons (Apache 2.0) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></symbol>
+    <symbol id="i-mic-off" viewBox="0 0 24 24"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></symbol>
+    <symbol id="i-cam-off" viewBox="0 0 24 24"><path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></symbol>
+    <symbol id="i-present" viewBox="0 0 24 24"><path d="M21 3H3c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h18c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 16.02H3V4.98h18v14.04zM10 12H8l4-4 4 4h-2v4h-4v-4z"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M23 5.5V20c0 2.2-1.8 4-4 4h-7.3c-1.08 0-2.1-.43-2.85-1.19L1 14.83s1.26-1.23 1.3-1.25c.22-.19.49-.29.79-.29.22 0 .42.06.6.16.04.01 4.31 2.46 4.31 2.46V4c0-.83.67-1.5 1.5-1.5S11 3.17 11 4v7h1V1.5c0-.83.67-1.5 1.5-1.5S15 .67 15 1.5V11h1V2.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5V11h1V5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5z"/></symbol>
+    <symbol id="i-call-end" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></symbol>
+    <symbol id="i-mood" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></symbol>
+    <symbol id="i-video-call" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></symbol>
+  </svg>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
