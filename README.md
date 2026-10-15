@@ -14,6 +14,12 @@ Open http://localhost:3000, click **New meeting**, and share the link (e.g. `htt
 > Browsers only allow camera and mic on **HTTPS or localhost**. To use it across machines, put it behind HTTPS (a reverse proxy, or a tunnel such as ngrok or Cloudflare Tunnel).
 > For users on restrictive networks, add a TURN server: `ICE_SERVERS='[{"urls":"turn:turn.example.com:3478","username":"u","credential":"p"}]' npm start`
 
+## Deploy to Render
+
+This repo includes a [Render Blueprint](render.yaml). In the Render dashboard choose **New → Blueprint**, pick this repository and click **Apply**. Render builds it, gives it an HTTPS URL (needed for camera and mic), and redeploys on every push to `main`.
+
+Vercel isn't suitable: its serverless functions can't keep the long-lived WebSocket connections and in-memory meeting state this app relies on.
+
 ## Features
 
 - Meet-style meeting codes and deep links (`/abc-defg-hij`); join by code, code without dashes, or a pasted link

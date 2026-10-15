@@ -1,0 +1,17 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: meetup
+    runtime: node
+    plan: free
+    # Dev dependencies (Playwright, test client) aren't needed to run the app.
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Uncomment to log per-participant audio diagnostics.
+      # - key: MEETUP_DEBUG
+      #   value: "1"
